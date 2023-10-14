@@ -4,6 +4,17 @@ import time
 import requests
 import json
 
+def remove_emoticon(text):
+    # ':)'が存在するかを確認
+    if ':)' in text:
+        # ':)'の位置を取得
+        index = text.index(':)')
+        # ':)'より前の部分を取得
+        result = text[:index]
+        return result
+    else:
+        return text
+
 # サーバーのIPアドレスとポート番号
 SERVER_IP = "localhost"
 SERVER_PORT = 3123
@@ -25,6 +36,7 @@ while True:
 
     # サーバーからのデータを受信する
     output = clisock.recv(1024).decode("utf-8")
+    output = remove_emoticon(output)
     print("サーバーからの応答:", output)
 
     # 音声合成と再生

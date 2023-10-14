@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WebUI</title>
+    <style>
+        .container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100vh;
+        }
+        .input-field {
+            width: 300px;
+            height: 40px;
+            font-size: 16px;
+        }
+        .submit-btn {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        #response {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="inputForm">
+            <input type="text" id="text" name="text" class="input-field">
+
+            <button id="submitBtn" class="submit-btn" disabled>送信</button>
+        </form>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        var textInput = document.getElementById("text");
+        var submitBtn = document.getElementById("submitBtn");
+
+        textInput.addEventListener("input", function() {
+            var text = this.value.trim();
+            if (text !== "") {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        });
+
+        document.getElementById("inputForm").addEventListener("submit", function(event) {
+            event.preventDefault();  // フォームのデフォルトの送信をキャンセル
+
+            var text = textInput.value.trim();
+            if (text !== "") {
+                textInput.disabled = true;  // テキスト入力欄を非活性化
+                submitBtn.disabled = true;  // 送信ボタンを非活性化
+
+                var responseDiv = document.getElementById("response");
+                responseDiv.innerHTML = "送信中...";
+
+                // 以下の部分にサーバーへの送信処理を追加する
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/submit", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        if (xhr.status == 200) {
+                            responseDiv.innerHTML = "サーバーからの応答: " + xhr.responseText;
+                        } else {
+                            console.error("エラーが発生しました。ステータスコード: " + xhr.status);
+                        }
+                        textInput.value = "";  // テキスト入力欄をクリア
+                        textInput.disabled = false;  // テキスト入力欄を活性化
+                        submitBtn.disabled = false;  // 送信ボタンを活性化
+                    }
+                };
+                var formData = new FormData();
+                formData.append("text", text);
+                xhr.send(formData);
+            }
+        });
+    </script>
+</body>
+</html>

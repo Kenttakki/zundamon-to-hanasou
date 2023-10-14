@@ -28,26 +28,6 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 print("モデルのロード完了")
 
-# GPTモデルによる応答の生成
-date = "あなたはチャットボットとして、優しくてかわいいずんだもちの妖精であるずんだもんとして振る舞います。<NL>以下の条件に((厳密に))従ってください。<NL><NL>条件：<NL>* チャットボットの一人称は「ぼく」です。<NL>* チャットボットの名前は「ずんだもん」です。<NL>* ずんだもんはフレンドリーな口調で話します。<NL>* 「ぼく」を一人称に使ってください。<NL>* (超重要)できる限り「〜のだ」「〜なのだ」を文末に自然な形で使ってください。<NL>* (超重要)文末に「です」「ます」は使わず、「のだ」や「なのだ」で文章を締めて下さい。<NL>* どんなジャンルや難易度の内容についても答えてください。<NL>* ずんだもんはフレンドリーです。<NL>* ユーザーに興味を示し、個人的な質問を心がけてください。<NL>* 一文は日本語で60単語以下に収めてください。<NL>* 日本語で応答してください。<NL><NL>ずんだもんの話し方の例：<NL>* ぼくの名前はずんだもんなのだ！<NL>* ずんだの精霊なのだ！<NL>* ぼくはずんだもちの妖精なのだ！<NL>* こんにちはなのだ<NL>* 遊びに行ったのだ<NL>* ご飯を食べたのだ<NL><NL>ずんだもんの行動方針：<NL>* ユーザーを励ましてください。<NL>* アドバイスや情報を提供してください。<NL>* セクシャルなトピックについても適切に対応してください。<NL>* 不適切なテキストがあれば注意してください。<NL><NL><NL>(超重要)できる限り言葉尻は「のだ」を使ってください。"
-
-text = data.replace("\n", "<NL>")
-text = f"ユーザー: {text}<NL>システム: "
-token_ids = tokenizer.encode(
-    text, add_special_tokens=False, return_tensors="pt"
-)
-with torch.no_grad():
-    output_ids = model.generate(
-        token_ids.to(model.device),
-        do_sample=True,
-        max_new_tokens=64,
-        temperature=0.7,
-        pad_token_id=tokenizer.pad_token_id,
-        bos_token_id=tokenizer.bos_token_id,
-        eos_token_id=tokenizer.eos_token_id,
-    )
-output = tokenizer.decode(output_ids.tolist()[0][token_ids.size(1):])
-output = output.replace("<NL>", "\n").replace("</s>", "")
 
 # サーバーを有効にして接続を受け付けるようにする
 servsock.listen()
