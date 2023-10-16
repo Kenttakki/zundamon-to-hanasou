@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, render_template, request
 import socket
 import pyaudio
@@ -9,30 +7,31 @@ import json
 
 app = Flask(__name__)
 
-# サーバーのIPアドレスとポート番号
-SERVER_IP = "localhost"
-SERVER_PORT = 3123
-
-# クライアント用のソケットを作成
-clisock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clisock.connect((SERVER_IP, SERVER_PORT))
-
+def remove_emoticon(text):
+    if ':)' in text:
+        index = text.index(':)')
+        result = text[:index]
+        return result
+    else:
+        return text
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
-def submit():
-    text = request.form['text']
+@app.route('/process_input', methods=['POST'])
+def process_input():
+    text = request.form['user_input']
 
     if text == "end":
-        clisock.close()
-        return "終了しました。"
+        return "Goodbye!"
 
+    clisock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clisock.connect(("localhost", 3123))
     clisock.send(text.encode("utf-8"))
-
     output = clisock.recv(1024).decode("utf-8")
+    output = remove_emoticon(output)
+    clisock.close()
 
     res1 = requests.post('http://127.0.0.1:50021/audio_query', params={'text': output, 'speaker': 1})
     res2 = requests.post('http://127.0.0.1:50021/synthesis', params={'speaker': 1}, data=json.dumps(res1.json()))
@@ -46,9 +45,7 @@ def submit():
     stream.close()
     p.terminate()
 
-    return output  # サーバーからの応答はテキストとして返す
-
-
+    return output
 
 if __name__ == '__main__':
     app.run(debug=True)

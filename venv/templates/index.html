@@ -1,85 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>WebUI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ずんだもんと話そう</title>
     <style>
         .container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            height: 100vh;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
         }
-        .input-field {
-            width: 300px;
-            height: 40px;
-            font-size: 16px;
+
+        .message {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
         }
-        .submit-btn {
-            font-size: 16px;
-            padding: 10px 20px;
-            margin-top: 10px;
-        }
-        #response {
-            margin-top: 20px;
+
+        .user-message {
+            background-color: #e6f7ff;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <form id="inputForm">
-            <input type="text" id="text" name="text" class="input-field">
-
-            <button id="submitBtn" class="submit-btn" disabled>送信</button>
+        <h1>ずんだもんと話そう</h1>
+        <div id="chat">
+            <!-- Messages will be displayed here -->
+        </div>
+        <form id="chat-form" action="/process_input" method="post">
+            <input type="text" id="user_input" name="user_input" autocomplete="off">
+            <input type="submit" value="送信" id="submit_button" disabled>
         </form>
-        <div id="response"></div>
     </div>
 
     <script>
-        var textInput = document.getElementById("text");
-        var submitBtn = document.getElementById("submitBtn");
+        function toggleSubmitButtonState(enabled) {
+            document.getElementById("submit_button").disabled = !enabled;
+        }
 
-        textInput.addEventListener("input", function() {
-            var text = this.value.trim();
-            if (text !== "") {
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.disabled = true;
-            }
+        function appendMessage(message, isUser) {
+            const chat = document.getElementById("chat");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = "message" + (isUser ? " user-message" : "");
+            messageDiv.textContent = message;
+            chat.appendChild(messageDiv);
+        }
+
+        const chatForm = document.getElementById("chat-form");
+        const userInput = document.getElementById("user_input");
+        const submitButton = document.getElementById("submit_button");
+
+        chatForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const userInputValue = userInput.value;
+            appendMessage(userInputValue, true);
+            toggleSubmitButtonState(false);
+
+            fetch("/process_input", {
+                method: "POST",
+                body: new URLSearchParams({ user_input: userInputValue }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                appendMessage(data, false);
+                toggleSubmitButtonState(true);
+            });
+
+            userInput.value = "";
         });
 
-        document.getElementById("inputForm").addEventListener("submit", function(event) {
-            event.preventDefault();  // フォームのデフォルトの送信をキャンセル
-
-            var text = textInput.value.trim();
-            if (text !== "") {
-                textInput.disabled = true;  // テキスト入力欄を非活性化
-                submitBtn.disabled = true;  // 送信ボタンを非活性化
-
-                var responseDiv = document.getElementById("response");
-                responseDiv.innerHTML = "送信中...";
-
-                // 以下の部分にサーバーへの送信処理を追加する
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "/submit", true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == XMLHttpRequest.DONE) {
-                        if (xhr.status == 200) {
-                            responseDiv.innerHTML = "サーバーからの応答: " + xhr.responseText;
-                        } else {
-                            console.error("エラーが発生しました。ステータスコード: " + xhr.status);
-                        }
-                        textInput.value = "";  // テキスト入力欄をクリア
-                        textInput.disabled = false;  // テキスト入力欄を活性化
-                        submitBtn.disabled = false;  // 送信ボタンを活性化
-                    }
-                };
-                var formData = new FormData();
-                formData.append("text", text);
-                xhr.send(formData);
-            }
+        userInput.addEventListener("input", function () {
+            toggleSubmitButtonState(userInput.value.trim() !== "");
         });
     </script>
 </body>
