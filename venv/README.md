@@ -9,6 +9,6 @@ Pytorch
 requests
 pyaudio
 SpeechRecognition
-socket
+sockets
 accelerate
 simpleaudio
