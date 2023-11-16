@@ -60,7 +60,7 @@ while True:
             output_ids = model.generate(
                 token_ids.to(model.device),
                 do_sample=True,
-                max_new_tokens=64,
+                max_new_tokens=128,
                 temperature=0.7,
                 pad_token_id=tokenizer.pad_token_id,
                 bos_token_id=tokenizer.bos_token_id,

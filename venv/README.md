@@ -12,3 +12,4 @@ SpeechRecognition
 socket
 accelerate
 simpleaudio
+faslk
