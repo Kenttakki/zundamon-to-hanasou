@@ -1,15 +1,15 @@
 # zundamon-to-hanasou
 VOICEVOXのインストール
 
-<br><font size+2>各種pythonモジュール
-
-<br>transformers
-<br>sentencepiece
-<br>Pytorch
-<br>requests
-<br>pyaudio
-<br>SpeechRecognition
-<br>socket
-<br>accelerate
-<br>simpleaudio
-<br>faslk
+<a><br><font size=+1>各種pythonモジュール</font>
+-  transformers
+-  sentencepiece
+-  Pytorch
+- requests
+-  pyaudio
+-  SpeechRecognition
+-  socket
+-  accelerate
+-  simpleaudio
+-  faslk
+</a>
