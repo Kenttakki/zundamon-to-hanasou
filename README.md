@@ -13,3 +13,6 @@ VOICEVOXのインストール
 -  simpleaudio
 -  faslk
 </a>
+
+# ファイルが入っている場所
+[こちら](/venv)
