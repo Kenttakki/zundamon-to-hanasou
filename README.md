@@ -16,3 +16,8 @@ VOICEVOXのインストール
 
 # ファイルが入っている場所
 [こちら](/venv)
+
+#やり方
+1.各種pythonモジュール
+<br> 
+[pytorch](https://pytorch.org/)は公式サイトからインストールすることをお勧めします
